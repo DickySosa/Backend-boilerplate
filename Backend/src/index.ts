@@ -1,13 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import { DbSource } from './dbConfig/dbConfig';
-import { UserService } from './services/user.service';
+const express = require('express');
+const cors = require('cors');
+const { DbSource } = require('./dbConfig/dbConfig');
+const { UserService } = require('./services/user.service');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 const PORT = 9000;
-const userService: UserService = UserService.getInstance();
+const userService = UserService.getInstance();
 
 DbSource.getInstance().initialize()
     .then(() => {
@@ -21,7 +21,7 @@ app.listen(PORT, () => {
     console.log(`Server running on PORT: ${PORT}`);
 });
 
-
+//User CRUD
 app.post('/v1/api/user', userService.createUser);
 app.get('/v1/api/users', userService.getUser);
 app.put('/v1/api/user/:id', userService.updateUser)

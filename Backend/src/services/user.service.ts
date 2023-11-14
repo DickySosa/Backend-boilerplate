@@ -24,6 +24,7 @@ export class UserService {
 
     public async createUser  (req:Request, res:Response){
         const {username,email,password} = req.body
+        console.log("trying req >>>>>>>", req.body)
         try {
             const user = await this.userRepository.save({
                 username, email, password
