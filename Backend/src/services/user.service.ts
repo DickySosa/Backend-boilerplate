@@ -35,5 +35,64 @@ export class UserService {
             res.status(500).json({message:"Error ocurred while saving user in Database"});
         }
     }
+
+    public async getAllUsers (req:Request, res:Response) {
+        try {
+            const users = await this.userRepository.find()
+            res.status(200).json(users);
+        } catch (error) {
+            console.log('ERROR >>>> ', error)
+            res.status(500).json({message:"Error ocurred while saving user in Database"});
+        }
+    }
+
+    public async getUser (req:Request, res:Response) {
+        try {
+            const userId = parseInt(req.params.id)
+            const user = await this.userRepository.findOneBy({
+                id: userId
+            })
+            if(user){
+             res.status(200).json(user)
+            } else {
+                res.status(404).json({message: 'User was not found'})
+            }
+        } catch (error) {
+            console.log('ERROR >>>> ', error)
+            res.status(500).json({message: 'Unable to get user'})
+        }
+    }
+
+    public async updateUser  (req:Request, res:Response) {
+        const {username,email,password} = req.body
+        const userId = parseInt(req.params.id)
+        try {
+            const user = await this.userRepository.save({
+                id: userId,username, email, password
+            })
+            this.userRepository.save(user)
+            res.status(200).json({message:"User updated correctly"});
+        } catch (error) {
+            console.log('ERROR >>>> ', error)
+            res.status(500).json({message:"Error ocurred while updating user in Database"});
+        }
+    }
+    public async deleteUser (req:Request, res:Response) {
+        try {
+            const gameId = parseInt(req.params.id)
+            const game = await this.userRepository.delete({
+              id: gameId
+            })
+            if (game.affected === 1) {
+              res.json({message:"User delete successfully"});
+            } else {
+              res.status(404).json({message:"User does not exist"});
+            }
+            console.log(game);
+          } catch (error) {
+            console.log("Error ocurred while deleting user >>>>", error);
+            res.status(500).json({message: "Error ocurred while deleting game"});
+          }
+    }
  }
  
