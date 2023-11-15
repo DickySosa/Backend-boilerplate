@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User } from "../entity/user.entity";
+import { User } from "../entity/user/user.entity";
 import { DbSource } from '../dbConfig/dbConfig';
 import { DataSource, Repository } from 'typeorm';
 
@@ -11,10 +11,9 @@ export class UserService {
  
     private constructor(){
         this.db = DbSource.getInstance();
-        this.userRepository = this.db.getRepository(User)
-        
+        this.userRepository = this.db.getRepository(User);
     }
- 
+    
     public static getInstance(): UserService {
        if(!UserService.instance){
           UserService.instance = new UserService();
@@ -22,20 +21,40 @@ export class UserService {
        return UserService.instance
     }
 
-    public async createUser  (req:Request, res:Response){
-        const {username,email,password} = req.body
-        console.log("trying req >>>>>>>", req.body)
+    public async createUser(req: Request, res: Response) {
+        console.log("Inside createUser");
+        console.log("UserRepository:", this.userRepository);
+        const { username, email, password } = req.body;
+    
         try {
+            console.log("Before save");
             const user = await this.userRepository.save({
                 username, email, password
-            })
-            this.userRepository.save(user)
-            res.status(200).json({message:"User saved in Database"});
+            });
+            console.log("After save");
+            this.userRepository.save(user);
+            console.log("After second save");
+            res.status(200).json({ message: "User saved in Database" });
         } catch (error) {
-            console.log('ERROR >>>> ', error)
-            res.status(500).json({message:"Error ocurred while saving user in Database"});
+            console.log('ERROR >>>> ', error);
+            res.status(500).json({ message: "Error occurred while saving user in Database" });
         }
     }
+    
+    // public async createUser  (req:Request, res:Response){
+    //     const {username,email,password} = req.body
+    //     console.log("trying req >>>>>>>", req.body)
+    //     try {
+    //         const user = await this.userRepository.save({
+    //             username, email, password
+    //         })
+    //         this.userRepository.save(user)
+    //         res.status(200).json({message:"User saved in Database"});
+    //     } catch (error) {
+    //         console.log('ERROR >>>> ', error)
+    //         res.status(500).json({message:"Error ocurred while saving user in Database"});
+    //     }
+    // }
 
     public async getAllUsers (req:Request, res:Response) {
         try {
