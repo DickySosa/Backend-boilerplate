@@ -23,6 +23,7 @@ app.listen(PORT, () => {
 
 //User CRUD
 app.post('/v1/api/user', userService.createUser);
-app.get('/v1/api/users', userService.getUser);
+app.get('/v1/api/users', userService.getAllUsers);
+app.get('/v1/api/user/:id', userService.getUser);
 app.put('/v1/api/user/:id', userService.updateUser)
 app.delete('/v1/api/user/:id',userService.deleteUser)

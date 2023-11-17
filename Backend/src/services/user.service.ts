@@ -9,10 +9,24 @@ export class UserService {
     private userRepository: Repository<User>;
     private static instance: UserService;
  
-    private constructor(){
-        this.db = DbSource.getInstance();
-        this.userRepository = this.db.getRepository(User);
+    private isInitialized: boolean = false;
+
+private async initialize() {
+    this.db = DbSource.getInstance();
+    console.log('DBSource >>>>> ', this.db)
+    this.userRepository = this.db.getRepository(User);
+    console.log('userRepository >>>>> ', this.userRepository)
+    this.isInitialized = true;
+}
+    
+    private constructor() {
+        this.initialize().then(() => {
+            console.log("UserService initialized successfully");
+        }).catch((error) => {
+            console.error("Error initializing UserService", error);
+        });
     }
+    
     
     public static getInstance(): UserService {
        if(!UserService.instance){
@@ -22,10 +36,7 @@ export class UserService {
     }
 
     public async createUser(req: Request, res: Response) {
-        console.log("Inside createUser");
-        console.log("UserRepository:", this.userRepository);
         const { username, email, password } = req.body;
-    
         try {
             console.log("Before save");
             const user = await this.userRepository.save({
@@ -40,29 +51,20 @@ export class UserService {
             res.status(500).json({ message: "Error occurred while saving user in Database" });
         }
     }
-    
-    // public async createUser  (req:Request, res:Response){
-    //     const {username,email,password} = req.body
-    //     console.log("trying req >>>>>>>", req.body)
-    //     try {
-    //         const user = await this.userRepository.save({
-    //             username, email, password
-    //         })
-    //         this.userRepository.save(user)
-    //         res.status(200).json({message:"User saved in Database"});
-    //     } catch (error) {
-    //         console.log('ERROR >>>> ', error)
-    //         res.status(500).json({message:"Error ocurred while saving user in Database"});
-    //     }
-    // }
 
-    public async getAllUsers (req:Request, res:Response) {
+    public async getAllUsers(req: Request, res: Response) {
+        if (!this.isInitialized) {
+            // Puedes agregar un log aquí para verificar si se intenta acceder antes de la inicialización.
+            console.error("UserService not initialized yet");
+            return res.status(500).json({ message: "Service not initialized" });
+        }
+    
         try {
-            const users = await this.userRepository.find()
+            const users = await this.userRepository.find();
             res.status(200).json(users);
         } catch (error) {
-            console.log('ERROR >>>> ', error)
-            res.status(500).json({message:"Error ocurred while saving user in Database"});
+            console.log('ERROR >>>> ', error);
+            res.status(500).json({ message: "Error occurred while saving user in Database" });
         }
     }
 

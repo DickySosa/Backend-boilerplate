@@ -23,7 +23,7 @@ export class DbSource {
             host: "localhost",
             port: 5432,
             username: "postgres",
-            password: "Password",
+            password: "password",
             database: "database-name",
             entities: ["src/entity/**/*.ts"],
             logging: true,
